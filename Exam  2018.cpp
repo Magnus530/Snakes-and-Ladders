@@ -15,27 +15,27 @@ public:
     };
 
     static constexpr int n = 30;
-    int interval = 5;
 
     Cell board[n]{};
 
-    Cell p1;
-    Cell p2;
+    Cell p1{'A', 0};
+    Cell p2{'B', 0};
 public:
-    void game()
+    void throwAndMove()
     {
-        move();
-      //  initBoard();
-        std::cout << "\n\n";
-        printBoard();
+        while (true)
+        {
+            initBoard();
+            printBoard1();
+            system("pause");
+            system("cls");
+            printBoard2();
+            move();
+        }
     }
       
     void initBoard()
     {
-
-        board[9].number = 17;
-        board[28].number = 14;
-
         board[29].symbol = 'G';
         board[28].symbol = 'v';
         board[22].symbol = ladder;
@@ -45,13 +45,14 @@ public:
         board[11].symbol = ladder2;
         board[9].symbol = '*';
         board[0].symbol = 'S';
-    
-        board[p1.number].symbol = 'A';
 
-        p2.symbol = 'B';
+        for (int i = 0; i < n - 1; i++)
+        {
+            board[i].number = i;
+        }
     }
     // Array som teller opp i stigende rekkefølge.
-    void printBoard2()
+    void printBoard99()
     {
         for (int i = 0; i < 6; i++)
         {
@@ -63,7 +64,7 @@ public:
         }
     }
     // Array som teller ned i synkende rekkefølge, med alternerende rekker, først mot høyre så mot venstre.
-    void printBoard()
+    void printBoard1()
     {
         for (int i = 6; i > 0; i--)
         {
@@ -71,7 +72,14 @@ public:
             {
                 for (int j = 1; j < 6; j++)
                 {
-                    std::cout << '|' << board[i * 5 - j].symbol;
+                    if (p1.number == board[i * 5 - j].number)
+                    {
+                        std::cout << '|' << p1.symbol;
+                    }
+                    else
+                    {
+                        std::cout << '|' << board[i * 5 - j].symbol;
+                    }
                 }
                 std::cout << "|";
             }
@@ -79,7 +87,51 @@ public:
             {
                 for (int j = 0; j < 6; j++)
                 {
-                    std::cout << '|' << board[((i - 1) * 5) + j].symbol;
+                    if (p1.number == board[((i - 1) * 5) + j].number)
+                    {
+                        std::cout << '|' << p1.symbol;
+                    }
+                    else
+                    {
+                        std::cout << '|' << board[((i - 1) * 5) + j].symbol;
+                    }
+                }
+            }
+            std::cout << "\n";
+        }
+    }
+
+    void printBoard2()
+    {
+        for (int i = 6; i > 0; i--)
+        {
+            if (i % 2 == 0)
+            {
+                for (int j = 1; j < 6; j++)
+                {
+                    if (p2.number == board[i * 5 - j].number)
+                    {
+                        std::cout << '|' << p2.symbol;
+                    }
+                    else
+                    {
+                        std::cout << '|' << board[i * 5 - j].symbol;
+                    }
+                }
+                std::cout << "|";
+            }
+            else
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    if (p2.number == board[((i - 1) * 5) + j].number)
+                    {
+                        std::cout << '|' << p2.symbol;
+                    }
+                    else
+                    {
+                        std::cout << '|' << board[((i - 1) * 5) + j].symbol;
+                    }
                 }
             }
             std::cout << "\n";
@@ -152,50 +204,143 @@ public:
     void move()
     {
         int move = throwDie();
+        int move2 = throwDie();
 
         p1.number += move;
+        p2.number += move2;
 
         if (p1.number >= n-1)
         {
-            exit(1);
+            p1.number = 0;
         }
-       
-    /*    if (board[p1.number].number == board[9].number)
+        else if (p2.number >= n - 1)
         {
-            p1.number = board[p1.number].number;
+            p2.number = 0;
         }
-        else if(board[p1.number].number == board[28].number)
-        {
-            p1.number = board[p1.number].number;
-        } */
-    }
 
-    void throwAndMove()
-    {
-        throwDie();
-        move();
-        printBoard();
+        if (p1.number == board[9].number)
+        {
+            p1.number = board[17].number;
+        }
+        else if(p1.number == board[28].number)
+        {
+            p1.number = board[14].number;
+        }
+
+        if (p2.number == board[9].number)
+        {
+            p2.number = board[17].number;
+        }
+        else if (p2.number == board[28].number)
+        {
+            p2.number = board[14].number;
+        }
     }
 
     void play()
     {
-
+       throwAndMove();
+      // initRandomBoard();
+      // printBoard1();
     }
 
     void makeLadder(int length)
     {
+        int n = rand() % 3 + 25;
 
+        if (n == 27 && length == 3)
+        {
+            board[n].symbol = ladder2;
+            board[n - 6].symbol = ladder2;
+            board[n - 8].symbol = '*';
+        }
+        else if (n == 26 && length == 3)
+        {
+            board[n].symbol = ladder2;
+            board[n - 4].symbol = ladder2;
+            board[n - 8].symbol = '*';
+        }
+        else if (n == 25 && length == 3)
+        {
+            board[n].symbol = ladder2;
+            board[n - 2].symbol = ladder2;
+            board[n - 8].symbol = '*';
+        }
+
+        if (n == 27 && length == 2)
+        {
+            board[n].symbol = ladder2;
+            board[n - 6].symbol = '*';
+        }
+        else if (n == 26 && length == 2)
+        {
+            board[n].symbol = ladder2;
+            board[n - 4].symbol = '*';
+        }
+        else if (n == 25 && length == 2)
+        {
+            board[n].symbol = ladder2;
+            board[n - 2].symbol = '*';
+        }
     }
 
     void makeChute(int length)
     {
+        int n = rand() % 3 + 10;
+        std::cout << n << "\n";
 
+
+        if (n == 10 && length == 3)
+        {
+            board[n].symbol = 'v';
+            board[n - 2].symbol = ladder;
+            board[n - 8].symbol = ladder;
+        }
+        else if (n == 11 && length == 3)
+        {
+            board[n].symbol = 'v';
+            board[n - 4].symbol = ladder;
+            board[n - 8].symbol = ladder;
+        }
+        else if (n == 12 && length == 3)
+        {
+            board[n].symbol = 'v';
+            board[n - 6].symbol = ladder;
+            board[n - 8].symbol = ladder;
+        }
+
+        if (n == 10 && length == 2)
+        {
+            board[n].symbol = 'v';
+            board[n - 2].symbol = ladder;
+        }
+        else if (n == 11 && length == 2)
+        {
+            board[n].symbol = 'v';
+            board[n - 4].symbol = ladder;
+        }
+        else if (n == 12 && length == 2)
+        {
+            board[n].symbol = 'v';
+            board[n - 6].symbol = ladder;
+        }
     }
 
-    void initRandomBoar()
+    void initRandomBoard()
     {
-        //makeLadder();
-       // makeChute();
+        while (true)
+        {
+            board[29].symbol = 'G';
+            board[0].symbol = 'S';
+
+            for (int i = 0; i < n - 1; i++)
+            {
+                board[i].number = i;
+            }
+
+            makeLadder(3);
+            makeChute(3);
+        }
     }
 };
 
@@ -205,15 +350,7 @@ int main()
 
     Laddergame l;
 
-    l.game();
+    l.play();
 
-    try
-    {
-        throw 20;
-    }
-    catch (int e)
-    {
-        std::cout << e << "\n";
-    }
 }
 

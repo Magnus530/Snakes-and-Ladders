@@ -2,6 +2,7 @@
 #include <string>
 #include <ctime>
 #include <conio.h>
+#include <vector>
 
 class Laddergame
 {
@@ -16,6 +17,10 @@ public:
 
     static constexpr int n = 30;
 
+    int vRow = 6, vCol = 5;
+
+    std::vector<std::vector<int>> coord(vRow, vCol);
+
     Cell board[n]{};
 
     Cell p1{'A', 0};
@@ -23,9 +28,10 @@ public:
 public:
     void throwAndMove()
     {
+        initBoard();
+
         while (true)
         {
-            initBoard();
             printBoard1();
             system("pause");
             system("cls");
@@ -64,38 +70,40 @@ public:
         }
     }
     // Array som teller ned i synkende rekkefølge, med alternerende rekker, først mot høyre så mot venstre.
+
     void printBoard1()
     {
-        for (int i = 6; i > 0; i--)
+        for (int i = 5; i >= 0; i--)
         {
             if (i % 2 == 0)
             {
-                for (int j = 1; j < 6; j++)
+                for (int j = 0; j < 5; j++)
                 {
-                    if (p1.number == board[i * 5 - j].number)
+                    if (p1.number == board[i * 5 + j].number)
                     {
                         std::cout << '|' << p1.symbol;
                     }
                     else
                     {
-                        std::cout << '|' << board[i * 5 - j].symbol;
+                        std::cout << '|' << board[i * 5 + j].symbol;
                     }
                 }
                 std::cout << "|";
             }
             else
             {
-                for (int j = 0; j < 6; j++)
+                for (int j = 4; j >= 0; j--)
                 {
-                    if (p1.number == board[((i - 1) * 5) + j].number)
+                    if (p1.number == board[i * 5 + j].number)
                     {
                         std::cout << '|' << p1.symbol;
                     }
                     else
                     {
-                        std::cout << '|' << board[((i - 1) * 5) + j].symbol;
+                        std::cout << '|' << board[i * 5 + j].symbol;
                     }
                 }
+                std::cout << "|";
             }
             std::cout << "\n";
         }
@@ -103,39 +111,45 @@ public:
 
     void printBoard2()
     {
-        for (int i = 6; i > 0; i--)
+        for (int i = 5; i >= 0; i--)
         {
             if (i % 2 == 0)
             {
-                for (int j = 1; j < 6; j++)
+                for (int j = 0; j < 5; j++)
                 {
-                    if (p2.number == board[i * 5 - j].number)
+                    if (p2.number == board[i * 5 + j].number)
                     {
                         std::cout << '|' << p2.symbol;
                     }
                     else
                     {
-                        std::cout << '|' << board[i * 5 - j].symbol;
+                        std::cout << '|' << board[i * 5 + j].symbol;
                     }
                 }
                 std::cout << "|";
             }
             else
             {
-                for (int j = 0; j < 6; j++)
+                for (int j = 4; j >= 0; j--)
                 {
-                    if (p2.number == board[((i - 1) * 5) + j].number)
+                    if (p2.number == board[i * 5 + j].number)
                     {
                         std::cout << '|' << p2.symbol;
                     }
                     else
                     {
-                        std::cout << '|' << board[((i - 1) * 5) + j].symbol;
+                        std::cout << '|' << board[i * 5 + j].symbol;
                     }
                 }
+                std::cout << "|";
             }
             std::cout << "\n";
         }
+    }
+
+    void makeCoords()
+    {
+
     }
 
     void printNumb()
@@ -239,9 +253,37 @@ public:
 
     void play()
     {
-       throwAndMove();
-      // initRandomBoard();
-      // printBoard1();
+      // throwAndMove();
+       //initRandomBoard();
+       //printBoard1();
+
+        fillCoords();
+       // printCoords();
+    }
+
+    void fillCoords()
+    {
+        for (int i = 0; i < vRow; i++)
+        {
+            for (int j = 0; j < vCol; j++)
+            {
+                coords[i][j] = j;
+            }
+
+            std::cout << std::endl;
+        }
+    }
+
+    void printCoords()
+    {
+        for (int i = 0; i < coords.size(); i++)
+        {
+            for (int j = 0; j < coords[i].size(); j++)
+            {
+                std::cout << coords[i][j];
+            }
+            std::cout << std::endl;
+        }
     }
 
     void makeLadder(int length)
@@ -287,8 +329,6 @@ public:
     void makeChute(int length)
     {
         int n = rand() % 3 + 10;
-        std::cout << n << "\n";
-
 
         if (n == 10 && length == 3)
         {
@@ -328,19 +368,16 @@ public:
 
     void initRandomBoard()
     {
-        while (true)
+        board[29].symbol = 'G';
+        board[0].symbol = 'S';
+
+        for (int i = 0; i < n - 1; i++)
         {
-            board[29].symbol = 'G';
-            board[0].symbol = 'S';
-
-            for (int i = 0; i < n - 1; i++)
-            {
-                board[i].number = i;
-            }
-
-            makeLadder(3);
-            makeChute(3);
+            board[i].number = i;
         }
+
+        makeLadder(3);
+        makeChute(3);
     }
 };
 

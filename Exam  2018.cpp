@@ -2,11 +2,11 @@
 #include <string>
 #include <ctime>
 #include <conio.h>
-#include <vector>
 
 class Laddergame
 {
 public:
+    /* Happy variables drinking tea whilst cheering for a starting game. */
     char ladder = '\\', ladder2 = '/';
 
     struct Cell
@@ -15,31 +15,46 @@ public:
         int number;
     };
 
-    static constexpr int n = 30;
+    bool turnA = true;
 
-    int vRow = 6, vCol = 5;
+    static constexpr int n = 30, rLadLength = 3, rSliLength = 4;
 
-    std::vector<std::vector<int>> coord(vRow, vCol);
+    static constexpr int aRow = 6, aCol = 5;
+
+    Cell rLadder[rLadLength]{};
+    Cell rSlide[rSliLength]{};
+
+    int direction = 0, coordX = 0, coordY = 0, length = 0;
+
+    char star = '*', ladE = 'e', slide = 'v', sliE = 'c';
 
     Cell board[n]{};
 
     Cell p1{'A', 0};
     Cell p2{'B', 0};
 public:
+
+    /* A splendid dice is thrown before two appreciated players take turns. */
     void throwAndMove()
     {
-        initBoard();
-
         while (true)
         {
-            printBoard1();
+            printBoard();
+            move();
             system("pause");
             system("cls");
-            printBoard2();
-            move();
         }
     }
-      
+    
+    /* The spectacular game is played. */
+    void play()
+    {
+        initRandomBoard();
+        
+        throwAndMove();
+    }
+
+    /* Initiates respectful variables prior to game start. */
     void initBoard()
     {
         board[29].symbol = 'G';
@@ -52,12 +67,28 @@ public:
         board[9].symbol = '*';
         board[0].symbol = 'S';
 
-        for (int i = 0; i < n - 1; i++)
+        for (int i = 0; i < n; i++)
         {
             board[i].number = i;
         }
     }
-    // Array som teller opp i stigende rekkefølge.
+
+    /* Prepares marvelous variables before the game commences. */
+    void initRandomBoard()
+    {
+        board[29].symbol = 'G';
+        board[0].symbol = 'S';
+
+        for (int i = 0; i < n; i++)
+        {
+            board[i].number = i;
+        }
+
+        makeLadder(rLadLength);
+        makeChute(rSliLength);
+    }
+
+    /* Prints an interesting board in an increasing pattern. */
     void printBoard99()
     {
         for (int i = 0; i < 6; i++)
@@ -69,9 +100,9 @@ public:
             std::cout << '|' << "\n";
         }
     }
-    // Array som teller ned i synkende rekkefølge, med alternerende rekker, først mot høyre så mot venstre.
 
-    void printBoard1()
+    /* Prints a legendary board in a decreasing and alternating pattern, starting from left to right. */
+    void printBoard()
     {
         for (int i = 5; i >= 0; i--)
         {
@@ -79,52 +110,29 @@ public:
             {
                 for (int j = 0; j < 5; j++)
                 {
-                    if (p1.number == board[i * 5 + j].number)
+                    if ((p1.number == board[i * 5 + j].number) && (p1.number == p2.number))
+                    {
+                        if (turnA == true)
+                        {
+                            std::cout << '|' << p1.symbol;
+                        }
+                        else
+                        {
+                            std::cout << '|' << p2.symbol;
+                        }
+                    }
+                    else if (p1.number == board[i * 5 + j].number)
                     {
                         std::cout << '|' << p1.symbol;
                     }
-                    else
-                    {
-                        std::cout << '|' << board[i * 5 + j].symbol;
-                    }
-                }
-                std::cout << "|";
-            }
-            else
-            {
-                for (int j = 4; j >= 0; j--)
-                {
-                    if (p1.number == board[i * 5 + j].number)
-                    {
-                        std::cout << '|' << p1.symbol;
-                    }
-                    else
-                    {
-                        std::cout << '|' << board[i * 5 + j].symbol;
-                    }
-                }
-                std::cout << "|";
-            }
-            std::cout << "\n";
-        }
-    }
-
-    void printBoard2()
-    {
-        for (int i = 5; i >= 0; i--)
-        {
-            if (i % 2 == 0)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    if (p2.number == board[i * 5 + j].number)
+                    else if (p2.number == board[i * 5 + j].number)
                     {
                         std::cout << '|' << p2.symbol;
                     }
                     else
                     {
                         std::cout << '|' << board[i * 5 + j].symbol;
-                    }
+                    }   
                 }
                 std::cout << "|";
             }
@@ -132,7 +140,23 @@ public:
             {
                 for (int j = 4; j >= 0; j--)
                 {
-                    if (p2.number == board[i * 5 + j].number)
+                    if (p1.number == board[i * 5 + j].number && (p1.number == p2.number))
+                    {
+                        if (turnA == true)
+                        {
+                            std::cout << '|' << p1.symbol;
+                        }
+                        else
+                        {
+                            std::cout << '|' << p2.symbol;
+
+                        }
+                    }
+                    else if (p1.number == board[i * 5 + j].number)
+                    {
+                        std::cout << '|' << p1.symbol;
+                    }
+                    else if (p2.number == board[i * 5 + j].number )
                     {
                         std::cout << '|' << p2.symbol;
                     }
@@ -147,237 +171,297 @@ public:
         }
     }
 
-    void makeCoords()
-    {
-
-    }
-
-    void printNumb()
-    {
-        int p = 0;
-
-        // 29-25
-        for (int i = 0; i < 5; i++)
-        {
-            board[i].number = i + 29 - p;
-            p += 2;
-            std::cout << board[i].number;
-        }
-        p = 0;
-        std::cout << "\n";
-
-        // 20 -24
-        for (int i = 5; i < 10; i++)
-        {
-            board[i].number = i + 15;
-            std::cout << board[i].number;
-        }
-        std::cout << "\n";
-
-        // 19-15
-        for (int i = 10; i < 15; i++)
-        {
-            board[i].number = i + 9 - p;
-            p += 2;
-            std::cout << board[i].number;
-        }
-        p = 0;
-        std::cout << "\n";
-
-        // 10 -14
-        for (int i = 15; i < 20; i++)
-        {
-            board[i].number = i - 5;
-            std::cout << board[i].number;
-        }
-        std::cout << "\n";
-
-        // 9-5   20-24
-        for (int i = 20; i < 25; i++)
-        {
-            board[i].number = i - 11 - p;
-            p += 2;
-            std::cout << "0" << board[i].number;
-        }
-        p = 0;
-        std::cout << "\n";
-
-        //   0 -4
-        for (int i = 25; i < 30; i++)
-        {
-            board[i].number = i - 25;
-            std::cout << "0" << board[i].number;
-        }
-    }
-
+    /* Throws a magic dice. */
     int throwDie()
     {   
         return(rand() % 6 + 1);
     }
 
+    /* Returns a dependable y-coordinate. */
+    int posY()
+    {
+        int a = rand() % 6 + 0;
+        return(a);
+    }
+
+    /* Returns and encouraging x-coordinate. */
+    int posX()
+    {
+        int a = rand() % 5 + 0;
+        return(a);
+    }
+
+    /* Moves wonderful characters. */
     void move()
     {
-        int move = throwDie();
-        int move2 = throwDie();
+        int move = 0, move2 = 0;
 
-        p1.number += move;
-        p2.number += move2;
-
-        if (p1.number >= n-1)
+        if (p1.number >= n - 1)
         {
-            p1.number = 0;
+            std::cout << "\nPlayer 1 takes the game. Thanks for playing!\n";
+            exit(1);
+
         }
         else if (p2.number >= n - 1)
         {
-            p2.number = 0;
+            std::cout << "\nPlayer 2 takes the game. Thanks for playing!\n";
+            exit(1);
         }
 
-        if (p1.number == board[9].number)
+        if (turnA == true)
         {
-            p1.number = board[17].number;
+            move = throwDie();
+            turnA = false;
         }
-        else if(p1.number == board[28].number)
+        else
         {
-            p1.number = board[14].number;
+            move2 = throwDie();
+            turnA = true;
         }
 
-        if (p2.number == board[9].number)
-        {
-            p2.number = board[17].number;
-        }
-        else if (p2.number == board[28].number)
-        {
-            p2.number = board[14].number;
-        }
-    }
+        p1.number += move;
 
-    void play()
-    {
-      // throwAndMove();
-       //initRandomBoard();
-       //printBoard1();
+        p2.number += move2;
 
-        fillCoords();
-       // printCoords();
-    }
-
-    void fillCoords()
-    {
-        for (int i = 0; i < vRow; i++)
+        /* Moves up if start of ladder is found. Down if start of slide is found. */
+        if (board[p1.number].symbol == star)
         {
-            for (int j = 0; j < vCol; j++)
+            for (int i = 0; i < n; i++)
             {
-                coords[i][j] = j;
+                if (board[i].symbol == ladE)
+                {
+                    p1.number = board[i].number;
+                }
             }
-
-            std::cout << std::endl;
         }
-    }
-
-    void printCoords()
-    {
-        for (int i = 0; i < coords.size(); i++)
+        else if(board[p1.number].symbol == slide)
         {
-            for (int j = 0; j < coords[i].size(); j++)
+            for (int i = 0; i < n; i++)
             {
-                std::cout << coords[i][j];
+                if (board[i].symbol == sliE)
+                {
+                    p1.number = board[i].number;
+                }
             }
-            std::cout << std::endl;
+        }
+
+        if (board[p2.number].symbol == star)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                if (board[i].symbol == ladE)
+                {
+                    p2.number = board[i].number;
+                }
+            }
+        }
+        else if (board[p2.number].symbol == slide)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                if (board[i].symbol == sliE)
+                {
+                    p2.number = board[i].number;
+                }
+            }
         }
     }
 
+    /* Creates a masterful ladder. */
     void makeLadder(int length)
     {
-        int n = rand() % 3 + 25;
+        coordY = posY();
+        coordX = posX();
 
-        if (n == 27 && length == 3)
-        {
-            board[n].symbol = ladder2;
-            board[n - 6].symbol = ladder2;
-            board[n - 8].symbol = '*';
-        }
-        else if (n == 26 && length == 3)
-        {
-            board[n].symbol = ladder2;
-            board[n - 4].symbol = ladder2;
-            board[n - 8].symbol = '*';
-        }
-        else if (n == 25 && length == 3)
-        {
-            board[n].symbol = ladder2;
-            board[n - 2].symbol = ladder2;
-            board[n - 8].symbol = '*';
-        }
+        bool makeLadder = false;
 
-        if (n == 27 && length == 2)
+        while (makeLadder == false)
         {
-            board[n].symbol = ladder2;
-            board[n - 6].symbol = '*';
-        }
-        else if (n == 26 && length == 2)
-        {
-            board[n].symbol = ladder2;
-            board[n - 4].symbol = '*';
-        }
-        else if (n == 25 && length == 2)
-        {
-            board[n].symbol = ladder2;
-            board[n - 2].symbol = '*';
-        }
+            if (length > 5 || length <= 1)
+            {
+                std::cout << "Please select a ladder length greater than one and less than 6.\n";
+                exit(1);
+            }
+            else if (coordY + length - 1 > 5 || coordX + length - 1 > 4 || coordY == 0 && coordX == 0)
+            {
+                while (coordY + length - 1 > 5)
+                {
+                    coordY = posY();
+                }
+                while (coordX + length - 1 > 4)
+                {
+                    coordX = posX();
+                }
+
+                if (coordY == 0 && coordX == 0)
+                {
+                    coordY++;
+                }
+            }
+
+            rLadder[0].symbol = star;
+
+            for (int i = 1; i < length; i++)
+            {
+                if (i == length - 1)
+                {
+                    rLadder[i].symbol = ladE;
+                }
+                else
+                {
+                    rLadder[i].symbol = ladder2;
+                }
+            }
+
+            for (int i = 0; i < length; i++)
+            {
+                if (coordY % 2 == 0)
+                {
+                    if (i == 0)
+                    {
+                        rLadder[i].number = coordY * 5 + coordX;
+                    }
+                    else if (i % 2 == 1)
+                    {
+                        rLadder[i].number = (coordY + i)* 5 + (4 - (coordX + i));
+                    }
+                    else if (i % 2 == 0)
+                    {
+                        rLadder[i].number = (coordY + i) * 5 + (coordX + i);
+                    }    
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        rLadder[i].number = coordY * 5 + (4 - coordX);
+                    }
+                    else if (i % 2 == 1)
+                    {
+                        rLadder[i].number = (coordY + i) * 5 + (coordX + i);
+                    }
+                    else if (i % 2 == 0)
+                    {
+                        rLadder[i].number = (coordY + i) * 5 + (4 - (coordX + i));
+                    }
+                }
+                board[rLadder[i].number].symbol = rLadder[i].symbol;
+            }
+            makeLadder = true;
+        }      
     }
 
+    /* Creates an increadible slide. */
     void makeChute(int length)
     {
-        int n = rand() % 3 + 10;
+        coordY = posY();
+        coordX = posX();
 
-        if (n == 10 && length == 3)
-        {
-            board[n].symbol = 'v';
-            board[n - 2].symbol = ladder;
-            board[n - 8].symbol = ladder;
-        }
-        else if (n == 11 && length == 3)
-        {
-            board[n].symbol = 'v';
-            board[n - 4].symbol = ladder;
-            board[n - 8].symbol = ladder;
-        }
-        else if (n == 12 && length == 3)
-        {
-            board[n].symbol = 'v';
-            board[n - 6].symbol = ladder;
-            board[n - 8].symbol = ladder;
-        }
+        bool makeSlide = false;
 
-        if (n == 10 && length == 2)
+        while (makeSlide == false)
         {
-            board[n].symbol = 'v';
-            board[n - 2].symbol = ladder;
-        }
-        else if (n == 11 && length == 2)
-        {
-            board[n].symbol = 'v';
-            board[n - 4].symbol = ladder;
-        }
-        else if (n == 12 && length == 2)
-        {
-            board[n].symbol = 'v';
-            board[n - 6].symbol = ladder;
-        }
-    }
+            if (length > 5 || length <= 1)
+            {
+                std::cout << "Please select a slide length greater than one and less than 6.\n";
+                exit(1);
+            }
+            else if (coordY - (length - 1) <= 0 || coordX + (length - 1) > 4 || coordY == 5 && coordX == 0)
+            {
+                while (coordY - (length - 1) <= 0)
+                {
+                    coordY = posY();
+                }
+                while (coordX + (length - 1) > 4)
+                {
+                    coordX = posX();
+                }
 
-    void initRandomBoard()
-    {
-        board[29].symbol = 'G';
-        board[0].symbol = 'S';
+                if (coordY == 5 && coordX == 0)
+                {
+                    coordY--;
+                }
+            }
 
-        for (int i = 0; i < n - 1; i++)
-        {
-            board[i].number = i;
+            rSlide[0].symbol = slide;
+
+            for (int i = 1; i < length; i++)
+            {
+                if (i == length - 1)
+                {
+                    rSlide[i].symbol = sliE;
+                }
+                else
+                {
+                    rSlide[i].symbol = ladder;
+                }
+            }
+
+            for (int i = 0; i < length; i++)
+            {
+                if (coordY % 2 == 0)
+                {
+                    if (i == 0)
+                    {
+                        rSlide[i].number = coordY * 5 + coordX;
+                    }
+                    else if (i % 2 == 1)
+                    {
+                        rSlide[i].number = (coordY - i) * 5 + (4 - (coordX + i));
+                    }
+                    else if (i % 2 == 0)
+                    {
+                        rSlide[i].number = (coordY - i) * 5 + (coordX + i);
+                    }
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        rSlide[i].number = coordY * 5 + (4 - coordX);
+                    }
+                    else if (i % 2 == 1)
+                    {
+                        rSlide[i].number = (coordY - i) * 5 + (coordX + i);
+                    }
+                    else if (i % 2 == 0)
+                    {
+                        rSlide[i].number = (coordY - i) * 5 + (4 - (coordX + i));
+                    }
+                }
+               
+                if (board[rSlide[i].number].symbol == star || board[rSlide[i].number].symbol == ladE)
+                {
+                    coordY = posY();
+                    coordX = posX();
+
+                    while (coordY - (length - 1) <= 0)
+                    {
+                        coordY = posY();
+                    }
+                    while (coordX + (length - 1) > 4)
+                    {
+                        coordX = posX();
+                    }
+
+                    if (coordY == 5 && coordX == 0)
+                    {
+                        coordY--;
+                    }
+
+                    i = 0;
+                }
+                
+                if (i == length - 1)
+                {
+                    for (int i = 0; i < length; i++)
+                    {
+                        board[rSlide[i].number].symbol = rSlide[i].symbol;
+                    }
+                }
+            }
+            makeSlide = true;
         }
-
-        makeLadder(3);
-        makeChute(3);
     }
 };
 
@@ -388,6 +472,4 @@ int main()
     Laddergame l;
 
     l.play();
-
 }
-
